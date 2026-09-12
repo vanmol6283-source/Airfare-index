@@ -1,0 +1,49 @@
+# Airfare Price Index — Backend
+# Core framework
+fastapi==0.115.14
+uvicorn[standard]==0.34.3
+
+# Database
+sqlalchemy==2.0.41
+alembic==1.15.1
+
+# Validation / serialisation
+pydantic==2.11.7
+pydantic-settings==2.10.1
+
+# Data processing
+pandas==2.3.1
+numpy==2.3.1
+scipy==1.15.3
+
+# Scheduler (background jobs)
+apscheduler==3.11.0
+
+# HTTP client
+httpx==0.28.1
+aiohttp==3.12.14
+
+# Scraping
+playwright==1.52.0
+playwright-stealth==1.0.6
+fake-useragent==1.5.1
+beautifulsoup4==4.13.4
+lxml==5.4.0
+
+# Rate limiting / retry
+tenacity==9.1.2
+
+# Utilities
+python-dateutil==2.9.0
+pytz==2025.2
+
+# CORS / middleware
+python-multipart==0.0.20
+
+# Testing
+pytest==8.4.1
+pytest-asyncio==1.0.0
+httpx==0.28.1
+
+# Dev tools
+python-dotenv==1.1.1

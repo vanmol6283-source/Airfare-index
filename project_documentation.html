@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>APIx — Project Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10.5pt; line-height: 1.65; color: #1a1a2e; max-width: 100%; padding: 0;
+  }
+  .cover { text-align: center; padding: 60px 40px 40px; border-bottom: 4px solid #0F5C5C; margin-bottom: 32px; page-break-after: always; }
+  .cover h1 { font-size: 28pt; font-weight: 900; color: #0F5C5C; margin: 0; letter-spacing: -0.5px; }
+  .cover .subtitle { font-size: 13pt; color: #5C6B6B; margin-top: 12px; font-weight: 500; }
+  .cover .meta { margin-top: 40px; font-size: 10pt; color: #8a8a8a; }
+  .cover .badge { display: inline-block; background: #0F5C5C; color: white; padding: 6px 20px; border-radius: 20px; font-size: 9pt; font-weight: 700; margin-top: 24px; text-transform: uppercase; }
+  h1 { font-size: 20pt; font-weight: 800; color: #0F5C5C; border-bottom: 3px solid #0F5C5C; padding-bottom: 8px; margin: 36px 0 16px; page-break-after: avoid; }
+  h2 { font-size: 14.5pt; font-weight: 700; color: #0F5C5C; border-bottom: 1.5px solid #DCE4E4; padding-bottom: 6px; margin: 28px 0 12px; page-break-after: avoid; }
+  h3 { font-size: 12pt; font-weight: 700; color: #0A4444; margin: 20px 0 8px; page-break-after: avoid; }
+  p { margin: 8px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 9pt; page-break-inside: avoid; }
+  thead th { background: #0F5C5C; color: white; padding: 8px 10px; text-align: left; border: 1px solid #0A4444; }
+  td { padding: 6px 10px; border: 1px solid #DCE4E4; vertical-align: top; }
+  tbody tr:nth-child(even) { background: #F4F6F6; }
+  code { background: #F0F2F4; padding: 1.5px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; color: #0A4444; }
+  pre { background: #1a1a2e; color: #d4d4d4; padding: 14px 16px; border-radius: 8px; font-size: 8pt; margin: 12px 0; page-break-inside: avoid; border-left: 4px solid #0F5C5C; white-space: pre-wrap; }
+  .mermaid { text-align: center; margin: 20px 0; page-break-inside: avoid; }
+  .mermaid svg { max-width: 100%; height: auto; }
+  @media print { body { font-size: 10pt; } pre, table, .mermaid { page-break-inside: avoid; } h1, h2, h3 { page-break-after: avoid; } }
+</style>
+</head>
+<body>
+<div class="cover">
+  <h1>Airfare Price Index (APIx)</h1>
+  <div class="subtitle">Complete Project Documentation</div>
+  <div class="badge">Smart India Hackathon 2026</div>
+  <div class="meta"><p>India's First Real-Time Domestic Airfare Price Intelligence Platform</p></div>
+</div>
+
+<h1>Airfare Price Index (APIx) — Complete Project Documentation</h1>
+<blockquote>
+<p><strong>India's first real-time domestic airfare price intelligence platform.</strong>
+Built for SIH (Smart India Hackathon) to address the absence of a transparent, publicly accessible airfare price index for the Indian domestic aviation market.</p>
+</blockquote>
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1-socio-economic-context--problem-statement">Socio-Economic Context &amp; Problem Statement</a></li>
+<li><a href="#2-high-level-architecture">High-Level Architecture</a></li>
+<li><a href="#3-backend--complete-technical-details">Backend — Complete Technical Details</a></li>
+<li><a href="#4-the-8-stage-statistical-pipeline">The 8-Stage Statistical Pipeline</a></li>
+<li><a href="#5-database-schema-11-tables">Database Schema (11 Tables)</a></li>
+<li><a href="#6-rest-api-contract">REST API Contract</a></li>
+<li><a href="#7-scraping-infrastructure">Scraping Infrastructure</a></li>
+<li><a href="#8-frontend--complete-technical-details">Frontend — Complete Technical Details</a></li>
+<li><a href="#9-data-flow-end-to-end">Data Flow: End to End</a></li>
+<li><a href="#10-file-tree">File Tree</a></li>
+</ol>
+<hr />
+<h2>1. Socio-Economic Context &amp; Problem Statement</h2>
+<h3>1.1 The Problem: No Airfare Transparency in India</h3>
+<p>India's domestic aviation market is the <strong>3rd largest globally</strong> by passenger volume (~150 million pax/year), yet unlike CPI (Consumer Price Index) or WPI (Wholesale Price Index), <strong>no publicly available, statistically rigorous airfare price index exists</strong>. This creates several issues:</p>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Impact of Missing Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DGCA (Directorate General of Civil Aviation)</strong></td>
+<td>Cannot objectively monitor fare gouging or predatory pricing; relies on ad-hoc complaints</td>
+</tr>
+<tr>
+<td><strong>Ministry of Civil Aviation (MoCA)</strong></td>
+<td>No data-driven input for fare cap policy decisions (e.g., the 2020-2022 COVID fare bands)</td>
+</tr>
+<tr>
+<td><strong>Competition Commission of India (CCI)</strong></td>
+<td>Cannot detect coordinated carrier pricing or market abuse</td>
+</tr>
+<tr>
+<td><strong>Central Statistics Office (CSO/MOSPI)</strong></td>
+<td>Airfare is a CPI component but uses proxy survey data, not real-time market prices</td>
+</tr>
+<tr>
+<td><strong>Consumers &amp; Travel Agencies</strong></td>
+<td>No benchmark to assess whether a fare is "high" or "low" relative to historical norms</td>
+</tr>
+<tr>
+<td><strong>Airlines</strong></td>
+<td>No neutral industry benchmark for internal yield management comparison</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 Why Airfares Are Hard to Index</h3>
+<p>Unlike commodities (petrol, onions), airfares are:</p>
+<ul>
+<li><strong>Perishable</strong>: A seat on Flight 6E-2045 departing tomorrow is a fundamentally different product from the same seat next month</li>
+<li><strong>Dynamically priced</strong>: Revenue management systems change fares 10-50× per day per flight</li>
+<li><strong>Multi-dimensional</strong>: Price depends on route, carrier, booking class, advance purchase timing, day of week, seasonal demand, and channel (direct vs OTA)</li>
+<li><strong>Opaque</strong>: No central exchange or published price list — each fare is revealed only when a consumer searches</li>
+</ul>
+<p>This means a traditional "survey the market price" approach (as used for CPI) fails completely. The APIx project solves this by:</p>
+<ol>
+<li><strong>Continuous automated collection</strong> from multiple sources (scraping + APIs)</li>
+<li><strong>Statistical cleaning</strong> with outlier detection</li>
+<li><strong>Laspeyres-type weighted index construction</strong> following CPI methodology</li>
+<li><strong>Advance purchase window stratification</strong> — recognizing that T+1 (walk-up) and T+45 (deep advance) are different economic products</li>
+</ol>
+<h3>1.3 SIH Problem Statement Alignment</h3>
+<p>The Smart India Hackathon problem statement requires:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Real-time airfare data collection</td>
+<td>✅ 3-slot daily automated scraping (06:30, 12:30, 19:30 IST)</td>
+</tr>
+<tr>
+<td>Multiple data sources</td>
+<td>✅ 10+ scrapers (SerpAPI, Amadeus, IndiGo, SpiceJet, AirAsia, ClearTrip, EaseMyTrip, Ixigo, Akasa, Air India Express)</td>
+</tr>
+<tr>
+<td>Statistical index methodology</td>
+<td>✅ Weighted Laspeyres index with Törnqvist chain-linking</td>
+</tr>
+<tr>
+<td>Route × AP-window granularity</td>
+<td>✅ 8 routes × 5 AP windows = 40 basket items</td>
+</tr>
+<tr>
+<td>Data quality monitoring</td>
+<td>✅ IQR/MAD outlier detection, back-test against DGCA benchmarks</td>
+</tr>
+<tr>
+<td>Dashboard visualization</td>
+<td>✅ Full React SPA with interactive charts, maps, data explorer</td>
+</tr>
+<tr>
+<td>API for data consumers</td>
+<td>✅ REST API with OpenAPI docs at <code>/docs</code></td>
+</tr>
+</tbody>
+</table>
+<h3>1.4 Indian Aviation Market Context</h3>
+<p><strong>8 Monitored Routes</strong> (selected by traffic volume from DGCA FY2024 data):</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Distance</th>
+<th>Annual Pax</th>
+<th>Competition</th>
+<th>Economic Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEL-BOM</td>
+<td>1,148 km</td>
+<td>~12M</td>
+<td>Very High (4 carriers)</td>
+<td>India's busiest — corporate/business corridor</td>
+</tr>
+<tr>
+<td>DEL-BLR</td>
+<td>1,740 km</td>
+<td>~8M</td>
+<td>High (4 carriers)</td>
+<td>Tech corridor (Bangalore IT hubs)</td>
+</tr>
+<tr>
+<td>BOM-BLR</td>
+<td>842 km</td>
+<td>~5M</td>
+<td>High (3 carriers)</td>
+<td>Financial ↔ Tech link</td>
+</tr>
+<tr>
+<td>DEL-CCU</td>
+<td>1,305 km</td>
+<td>~4M</td>
+<td>Medium (3 carriers)</td>
+<td>East-West connectivity</td>
+</tr>
+<tr>
+<td>BLR-HYD</td>
+<td>500 km</td>
+<td>~3M</td>
+<td>Low (2 carriers)</td>
+<td>Short-haul commuter</td>
+</tr>
+<tr>
+<td>MAA-DEL</td>
+<td>1,753 km</td>
+<td>~4M</td>
+<td>Medium (3 carriers)</td>
+<td>South-North connectivity</td>
+</tr>
+<tr>
+<td>DEL-HYD</td>
+<td>1,253 km</td>
+<td>~5M</td>
+<td>High (3 carriers)</td>
+<td>Tech/pharma corridor</td>
+</tr>
+<tr>
+<td>BOM-CCU</td>
+<td>1,652 km</td>
+<td>~2.5M</td>
+<td>Medium (2 carriers)</td>
+<td>Financial ↔ East India</td>
+</tr>
+</tbody>
+</table>
+<p><strong>5 Advance Purchase (AP) Windows</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Window</th>
+<th>Days Before Departure</th>
+<th>Economic Interpretation</th>
+<th>Typical Fare Level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>T+1</strong></td>
+<td>1 day</td>
+<td>Emergency/walk-up — corporate travelers, family emergencies</td>
+<td>Highest (1.5-2× base)</td>
+</tr>
+<tr>
+<td><strong>T+7</strong></td>
+<td>7 days</td>
+<td>Short-notice — planned but urgent travel</td>
+<td>High (1.3-1.5× base)</td>
+</tr>
+<tr>
+<td><strong>T+15</strong></td>
+<td>15 days</td>
+<td>Standard leisure — typical vacation planning</td>
+<td>Moderate (1.1-1.2× base)</td>
+</tr>
+<tr>
+<td><strong>T+30</strong></td>
+<td>30 days</td>
+<td>Early advance — budget-conscious travelers</td>
+<td>Low (0.9-1.0× base)</td>
+</tr>
+<tr>
+<td><strong>T+45</strong></td>
+<td>45 days</td>
+<td>Deep advance — maximum savings</td>
+<td>Lowest (0.8-0.9× base)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Carrier Market Shares</strong> (DGCA FY2024):</p>
+<table>
+<thead>
+<tr>
+<th>Carrier</th>
+<th>IATA</th>
+<th>Domestic Share</th>
+<th>Role in Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IndiGo</td>
+<td>6E</td>
+<td>60%</td>
+<td>Dominant LCC — sets market prices</td>
+</tr>
+<tr>
+<td>Air India</td>
+<td>AI</td>
+<td>13%</td>
+<td>Full-service carrier (post-Tata merger)</td>
+</tr>
+<tr>
+<td>Akasa Air</td>
+<td>QP</td>
+<td>10%</td>
+<td>New entrant — aggressive pricing</td>
+</tr>
+<tr>
+<td>Air India Express</td>
+<td>IX</td>
+<td>7%</td>
+<td>LCC subsidiary of Air India</td>
+</tr>
+<tr>
+<td>SpiceJet</td>
+<td>SG</td>
+<td>5%</td>
+<td>Legacy LCC — financial stress</td>
+</tr>
+<tr>
+<td>Vistara (merged into AI)</td>
+<td>UK</td>
+<td>5%</td>
+<td>Premium carrier</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. High-Level Architecture</h2>
+<div class="mermaid">graph TB
+    subgraph "Data Sources"
+        S1["SerpAPI<br/>(Google Flights)"]
+        S2["Amadeus API<br/>(GDS Feed)"]
+        S3["Airline Websites<br/>(6E, SG, QP, IX, AIX)"]
+        S4["OTA Websites<br/>(ClearTrip, EaseMyTrip, Ixigo)"]
+    end
+
+    subgraph "Backend (Python/FastAPI)"
+        SCH["APScheduler<br/>3 slots/day"]
+        SCR["Scraper Layer<br/>10+ scrapers"]
+        CLN["Data Cleaner<br/>Bounds + IQR"]
+        PIP["8-Stage Pipeline<br/>MAD → Törnqvist"]
+        IDX["Index Computer<br/>Laspeyres weighted"]
+        DB["SQLite DB<br/>(WAL mode)"]
+        API["REST API<br/>/api/v1/*"]
+    end
+
+    subgraph "Frontend (React/Vite)"
+        OV["Overview<br/>Map + Summary + Chart"]
+        EX["Data Explorer<br/>Filter + Multi-view"]
+        RT["Routes<br/>Basket Table"]
+        RD["Route Detail<br/>AP Window Drill-down"]
+        MH["Methodology<br/>KaTeX Formulas"]
+        DQ["Data Quality<br/>Provenance Panel"]
+        AD["API Docs<br/>REST Reference"]
+    end
+
+    S1 & S2 & S3 & S4 --> SCR
+    SCH --> SCR
+    SCR --> CLN
+    CLN --> DB
+    DB --> PIP
+    PIP --> DB
+    DB --> IDX
+    IDX --> DB
+    DB --> API
+    API --> OV & EX & RT & RD & MH & DQ & AD
+</div>
+
+<h3>Technology Stack</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Backend</strong></td>
+<td>Python</td>
+<td>3.11</td>
+<td>Core runtime</td>
+</tr>
+<tr>
+<td></td>
+<td>FastAPI</td>
+<td>Latest</td>
+<td>REST API framework</td>
+</tr>
+<tr>
+<td></td>
+<td>SQLAlchemy</td>
+<td>2.0</td>
+<td>ORM + database access</td>
+</tr>
+<tr>
+<td></td>
+<td>SQLite</td>
+<td>3.x (WAL)</td>
+<td>Embedded database</td>
+</tr>
+<tr>
+<td></td>
+<td>APScheduler</td>
+<td>3.x</td>
+<td>Cron-like task scheduling</td>
+</tr>
+<tr>
+<td></td>
+<td>Playwright</td>
+<td>Latest</td>
+<td>Stealth browser automation for airline sites</td>
+</tr>
+<tr>
+<td></td>
+<td>Pydantic v2</td>
+<td>Latest</td>
+<td>Request/response validation</td>
+</tr>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>React</td>
+<td>19</td>
+<td>UI framework</td>
+</tr>
+<tr>
+<td></td>
+<td>Vite</td>
+<td>8.2</td>
+<td>Build tool + dev server</td>
+</tr>
+<tr>
+<td></td>
+<td>TanStack Query</td>
+<td>v5</td>
+<td>Server state management</td>
+</tr>
+<tr>
+<td></td>
+<td>TanStack Table</td>
+<td>v8</td>
+<td>Data table with sorting/pagination</td>
+</tr>
+<tr>
+<td></td>
+<td>Recharts</td>
+<td>Latest</td>
+<td>Charting library</td>
+</tr>
+<tr>
+<td></td>
+<td>Tailwind CSS</td>
+<td>v4</td>
+<td>Utility-first styling</td>
+</tr>
+<tr>
+<td></td>
+<td>Lucide React</td>
+<td>Latest</td>
+<td>Icon library</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>3. Backend — Complete Technical Details</h2>
+<h3>3.1 Directory Structure</h3>
+<pre><code>backend/
+├── .env                          # Environment variables
+├── Dockerfile                    # Python 3.11-slim + Playwright
+├── requirements.txt              # Pinned dependencies
+├── seed_data.py                  # Database seeder (40 basket items, 90-day history)
+├── airfare_index.db              # SQLite database (WAL mode)
+├── check_otas_robots.py          # Robots.txt compliance checker
+├── test_scrapers.py              # Scraper diagnostic CLI
+├── app/
+│   ├── __init__.py
+│   ├── config.py                 # Pydantic BaseSettings (routes, AP windows, CORS)
+│   ├── database.py               # SQLAlchemy engine + WAL pragma
+│   ├── main.py                   # FastAPI app, CORS, lifespan, routing
+│   ├── models.py                 # 11 SQLAlchemy ORM models
+│   ├── schemas.py                # Pydantic v2 response schemas
+│   ├── api/
+│   │   ├── basket.py             # GET /basket, GET /route/{id}
+│   │   ├── summary.py            # GET /summary
+│   │   ├── history.py            # GET /index-history
+│   │   └── data_quality.py       # GET /data-quality, GET /scrape-runs, POST /trigger-scrape
+│   ├── pipeline/
+│   │   ├── apix_pipeline.py      # 8-stage statistical pipeline
+│   │   ├── index.py              # Operational Laspeyres index computation
+│   │   └── cleaner.py            # Fare validation + IQR outlier removal
+│   └── scraper/
+│       ├── base.py               # Abstract BaseScraper
+│       ├── stealth_base.py       # Playwright stealth browser base
+│       ├── mock_scraper.py       # Deterministic offline scraper
+│       ├── scheduler.py          # APScheduler (3 slots × 3 scrapers)
+│       ├── robots_checker.py     # Cached robots.txt compliance
+│       ├── serpapi_scraper.py     # Google Flights via SerpAPI
+│       ├── amadeus_scraper.py    # Amadeus Flight Offers API
+│       ├── indigo.py             # IndiGo direct (Playwright)
+│       ├── spicejet.py           # SpiceJet direct (Playwright)
+│       ├── akasa.py              # Akasa Air direct (Playwright)
+│       ├── air_india_express.py  # AIX direct (Playwright)
+│       ├── cleartrip.py          # ClearTrip OTA (JSON API)
+│       ├── easemytrip.py         # EaseMyTrip OTA (Playwright)
+│       └── ixigo.py              # Ixigo OTA (Playwright)
+└── tests/
+    ├── fixtures.py               # Test data generator
+    └── test_api.py               # Pytest integration tests
+</code></pre>
+<h3>3.2 Application Lifecycle (<a href="file:///c:/Users/HP/Desktop/final_sih-8/backend/app/main.py">main.py</a>)</h3>
+<pre><code class="language-python">@asynccontextmanager
+async def lifespan(app):
+    # 1. Create all database tables (SQLAlchemy metadata)
+    Base.metadata.create_all(bind=engine)
+    # 2. Start APScheduler background scraping
+    start_scheduler()
+    yield
+    # 3. Graceful shutdown
+    stop_scheduler()
+</code></pre>
+<p><strong>CORS middleware</strong> allows origins on ports 5173–5176 and 3000 (localhost dev) with <code>GET</code> and <code>POST</code> methods.</p>
+<h3>3.3 Configuration (<a href="file:///c:/Users/HP/Desktop/final_sih-8/backend/app/config.py">config.py</a>)</h3>
+<p>Key settings:
+- <code>BASKET_ROUTES</code>: <code>["DEL-BOM", "DEL-BLR", "BOM-BLR", "DEL-CCU", "BLR-HYD", "MAA-DEL", "DEL-HYD", "BOM-CCU"]</code>
+- <code>AP_WINDOWS</code>: <code>[1, 7, 15, 30, 45]</code>
+- <code>BASE_PERIOD_DATE</code>: <code>"2026-05-29"</code> (APIx = 100.00 on this date)
+- <code>SCRAPING_DELAY_MIN_S / MAX_S</code>: 5–12 seconds (ethical rate limiting)</p>
+<hr />
+<h2>4. The 8-Stage Statistical Pipeline</h2>
+<p>This is the intellectual core of the project. It transforms raw scraped fare observations into a publication-quality price index.</p>
+<h3>Pipeline Overview</h3>
+<div class="mermaid">graph LR
+    RAW["Raw Quotes<br/>(per scrape)"] --> S1
+    S1["Stage 1<br/>MAD Outlier Removal<br/>+ Cell Median"] --> S2
+    S2["Stage 2<br/>Cross-Source<br/>Inverse-Variance Fusion"] --> S3
+    S3["Stage 3<br/>Regulatory Fare<br/>Decomposition"] --> S4
+    S4["Stage 4<br/>AP-Window<br/>Elasticity Curve Fit"] --> S5
+    S5["Stage 5<br/>Missing Cell<br/>Imputation"] --> S6
+    S6["Stage 6<br/>Carrier Market-Share<br/>Aggregation"] --> S7
+    S7["Stage 7<br/>Törnqvist<br/>Chain Index"] --> S8
+    S8["Stage 8<br/>DGCA Back-Test<br/>Validation"]
+</div>
+
+<h3>Stage 1: MAD Outlier Removal + Cell Median</h3>
+<p><strong>Problem</strong>: Scraped fares contain noise — cached pages, promo fares, business class leaking into economy searches, data entry errors.</p>
+<p><strong>Method</strong>: Modified Z-score using Median Absolute Deviation (MAD):</p>
+<p>$$M_z = \frac{0.6745 \times |x_i - \tilde{x}|}{MAD}$$</p>
+<p>where $MAD = \text{median}(|x_i - \tilde{x}|)$ and $\tilde{x}$ is the median fare.</p>
+<p>Any observation with $M_z &gt; 3.5$ is flagged as an outlier and excluded. The cell median of the remaining observations becomes the <strong>cell estimate</strong>.</p>
+<p><strong>Output</strong>: One <code>CellEstimate</code> row per (route, carrier, AP window, date, source).</p>
+<h3>Stage 2: Cross-Source Reconciliation</h3>
+<p><strong>Problem</strong>: Different sources (SerpAPI, airline direct, OTAs) report different prices for the same flight. Which do we trust?</p>
+<p><strong>Method</strong>: Inverse-variance weighting. Sources with historically lower variance get higher weight:</p>
+<p>$$\hat{p}_{\text{fused}} = \frac{\sum_s w_s \cdot p_s}{\sum_s w_s} \quad \text{where} \quad w_s = \frac{1}{\sigma_s^2}$$</p>
+<p>The variance $\sigma_s^2$ is computed from the <code>SourceVarianceStat</code> table, which accumulates over pipeline runs.</p>
+<h3>Stage 3: Regulatory Fare Decomposition</h3>
+<p><strong>Problem</strong>: Total fares include airport charges, GST, UDF, and convenience fees — these are government-set, not market-driven. The index should track the <strong>airline-determined base fare</strong> only.</p>
+<p><strong>Method</strong>: Decompose using AERA (Airports Economic Regulatory Authority) published fixed charges:</p>
+<p>$$\text{Base Fare} = \frac{\text{Total Fare} - F_{\text{origin}} - F_{\text{destination}}}{1 + \tau_{\text{GST}}}$$</p>
+<p>where:
+- $F_{\text{origin}}, F_{\text{destination}}$ are airport-specific fixed charges (DEL: ₹500, BOM: ₹450, BLR: ₹400, HYD: ₹350, MAA: ₹350, CCU: ₹300)
+- $\tau_{\text{GST}} = 0.05$ (5% GST on economy class domestic flights)</p>
+<h3>Stage 4: AP-Window Elasticity Curve Fit</h3>
+<p><strong>Problem</strong>: Understanding the fare curve as a function of advance purchase days.</p>
+<p><strong>Method</strong>: Log-linear regression:</p>
+<p>$$\ln(\text{fare}) = \alpha + \beta \cdot \ln(\text{AP days})$$</p>
+<p>A negative $\beta$ (expected) means fares decrease as booking moves further from departure. The fitted $(\alpha, \beta)$ parameters are stored in <code>ElasticityParam</code> for each route-date combination.</p>
+<h3>Stage 5: Missing Cell Imputation</h3>
+<p><strong>Problem</strong>: Not every (route, AP window) cell has data on every day. Some scrapes fail, some flights don't operate.</p>
+<p><strong>Method</strong>: Use the Stage 4 elasticity curve to predict the missing fare:</p>
+<p>$$\hat{p} = \exp(\alpha + \beta \cdot \ln(w))$$</p>
+<p>where $w$ is the AP window (in days). The imputed value is flagged with <code>is_imputed = True</code> in <code>RouteIndexValue</code>.</p>
+<h3>Stage 6: Carrier Market-Share Aggregation</h3>
+<p><strong>Problem</strong>: Different carriers have different fares. The index should reflect the market-weighted average, not just the cheapest.</p>
+<p><strong>Method</strong>: Weight by DGCA FY2024 domestic market share:</p>
+<table>
+<thead>
+<tr>
+<th>Carrier</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IndiGo (6E)</td>
+<td>0.60</td>
+</tr>
+<tr>
+<td>Air India (AI)</td>
+<td>0.13</td>
+</tr>
+<tr>
+<td>Akasa Air (QP)</td>
+<td>0.10</td>
+</tr>
+<tr>
+<td>Air India Express (IX)</td>
+<td>0.07</td>
+</tr>
+<tr>
+<td>SpiceJet (SG)</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>Vistara (UK)</td>
+<td>0.05</td>
+</tr>
+</tbody>
+</table>
+<p>$$\text{Route Fare} = \sum_c \text{share}_c \times \text{fare}_c$$</p>
+<h3>Stage 7: Törnqvist Chain Index</h3>
+<p><strong>Problem</strong>: A fixed-weight Laspeyres index suffers from substitution bias. The Törnqvist index uses period-average weights.</p>
+<p><strong>Method</strong>: Chain-linked logarithmic index:</p>
+<p>$$\ln\left(\frac{APIx_t}{APIx_{t-1}}\right) = \sum_{r,w} \bar{s}<em>{r,w} \cdot \ln\left(\frac{p</em>{r,w,t}}{p_{r,w,t-1}}\right)$$</p>
+<p>where $\bar{s}<em>{r,w} = \frac{s</em>{r,w,t} + s_{r,w,t-1}}{2}$ is the average expenditure share across the two periods.</p>
+<h3>Stage 8: DGCA Back-Test Validation</h3>
+<p><strong>Problem</strong>: How do we know the index is accurate?</p>
+<p><strong>Method</strong>: Compare monthly APIx averages against DGCA officially published average fares. Compute MAPE (Mean Absolute Percentage Error):</p>
+<p>$$MAPE = \frac{1}{n} \sum \left|\frac{APIx_{\text{month}} - DGCA_{\text{month}}}{DGCA_{\text{month}}}\right| \times 100$$</p>
+<p>Target: MAPE &lt; 5%. Benchmarks stored in <code>DGCABenchmark</code> table.</p>
+<h3>Operational Index (Live)</h3>
+<p>In practice, the live system uses a simplified <strong>Laspeyres weighted index</strong> from <a href="file:///c:/Users/HP/Desktop/final_sih-8/backend/app/pipeline/index.py">index.py</a>:</p>
+<p>$$APIx_t = \frac{\sum_{i} W_i \times PR_i}{\sum_{i} W_i} \quad \text{where} \quad PR_i = \frac{\text{current fare}_i}{\text{base fare}_i} \times 100$$</p>
+<p>This runs daily after each scrape slot. The full 8-stage pipeline (<code>apix_pipeline.py</code>) is designed for research-grade offline computation.</p>
+<hr />
+<h2>5. Database Schema (11 Tables)</h2>
+<div class="mermaid">erDiagram
+    basket_items ||--o{ raw_quotes : "has"
+    basket_items {
+        int id PK
+        string route "DEL-BOM"
+        string origin "DEL"
+        string destination "BOM"
+        int ap_window "1,7,15,30,45"
+        float weight "sum~100"
+        float base_fare "INR"
+        bool is_active
+    }
+    raw_quotes {
+        int id PK
+        int basket_item_id FK
+        string origin
+        string destination
+        string carrier "6E,AI,SG..."
+        date departure_date
+        date collection_date
+        int ap_days
+        float base_fare
+        float taxes
+        float udf
+        float total_fare
+        string source
+        bool is_valid
+        string rejection_reason
+    }
+    index_values {
+        int id PK
+        date date UK
+        float apix
+        float basket_coverage
+    }
+    scrape_runs {
+        int id PK
+        datetime started_at
+        datetime finished_at
+        string status
+        int quotes_collected
+        int quotes_rejected
+    }
+    data_quality_stats {
+        int id PK
+        date date
+        string source
+        int quotes_collected
+        int quotes_rejected
+        float back_test_deviation_pct
+    }
+    cell_estimates {
+        int id PK
+        string route
+        string carrier_code
+        int ap_window_bucket
+        date collection_date
+        string source
+        float fare_median_inr
+        int n_obs
+        int n_outliers_removed
+    }
+    elasticity_params {
+        int id PK
+        string route
+        date collection_date
+        float alpha
+        float beta
+        float r_squared
+    }
+    route_index_values {
+        int id PK
+        string route
+        int ap_window_bucket
+        date collection_date
+        float route_fare_inr
+        bool is_imputed
+    }
+    dgca_benchmarks {
+        int id PK
+        string route
+        int year
+        int month
+        float dgca_avg_fare_inr
+    }
+    seasonal_calendar {
+        int id PK
+        string event_name
+        string event_type
+        date start_date
+        date end_date
+    }
+    source_variance_stats {
+        int id PK
+        string source UK
+        float variance_inr_squared
+        int n_samples
+    }
+</div>
+
+<h3>Table Purposes</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Rows (Seeded)</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>basket_items</code></td>
+<td>40</td>
+<td>8 routes × 5 AP windows — defines what we track</td>
+</tr>
+<tr>
+<td><code>raw_quotes</code></td>
+<td>~9,500</td>
+<td>Every scraped fare (immutable audit log)</td>
+</tr>
+<tr>
+<td><code>index_values</code></td>
+<td>91</td>
+<td>Daily composite APIx (one per day)</td>
+</tr>
+<tr>
+<td><code>scrape_runs</code></td>
+<td>varies</td>
+<td>Job execution audit trail</td>
+</tr>
+<tr>
+<td><code>data_quality_stats</code></td>
+<td>~276</td>
+<td>Per-source quality metrics</td>
+</tr>
+<tr>
+<td><code>cell_estimates</code></td>
+<td>—</td>
+<td>Stage 1: robust median per cell</td>
+</tr>
+<tr>
+<td><code>elasticity_params</code></td>
+<td>—</td>
+<td>Stage 4: log-linear fit per route-date</td>
+</tr>
+<tr>
+<td><code>route_index_values</code></td>
+<td>—</td>
+<td>Stage 6: per-route weighted fare</td>
+</tr>
+<tr>
+<td><code>dgca_benchmarks</code></td>
+<td>—</td>
+<td>Stage 8: DGCA published monthly averages</td>
+</tr>
+<tr>
+<td><code>seasonal_calendar</code></td>
+<td>—</td>
+<td>Holiday/event annotations</td>
+</tr>
+<tr>
+<td><code>source_variance_stats</code></td>
+<td>—</td>
+<td>Stage 2: source reliability weights</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6. REST API Contract</h2>
+<p>All endpoints are prefixed with <code>/api/v1</code>.</p>
+<h3><code>GET /api/v1/summary</code></h3>
+<p>Returns the headline index dashboard data.</p>
+<pre><code class="language-json">{
+  &quot;apixToday&quot;: 99.01,
+  &quot;momChange&quot;: 0.54,
+  &quot;yoyChange&quot;: 0.0,
+  &quot;lastUpdated&quot;: &quot;2026-08-27T00:00:00Z&quot;,
+  &quot;routesTracked&quot;: 8,
+  &quot;dataPointsToday&quot;: 308
+}
+</code></pre>
+<p><strong>Logic</strong>: Fetches latest <code>IndexValue</code>, counts today's valid <code>RawQuote</code> rows, computes MoM/YoY using <code>compute_mom_change()</code> / <code>compute_yoy_change()</code>.</p>
+<hr />
+<h3><code>GET /api/v1/basket</code></h3>
+<p>Returns all 40 active basket items with enriched data.</p>
+<pre><code class="language-json">[
+  {
+    &quot;route&quot;: &quot;DEL-BOM&quot;,
+    &quot;origin&quot;: &quot;DEL&quot;,
+    &quot;destination&quot;: &quot;BOM&quot;,
+    &quot;apWindow&quot;: &quot;T+1&quot;,
+    &quot;baseFare&quot;: 8900.0,
+    &quot;currentFare&quot;: 9150.0,
+    &quot;priceRelative&quot;: 1.03,
+    &quot;weight&quot;: 3.21,
+    &quot;change7d&quot;: 1.52,
+    &quot;change30d&quot;: 3.80,
+    &quot;dataPoints&quot;: 60,
+    &quot;history&quot;: [
+      { &quot;date&quot;: &quot;2026-08-01&quot;, &quot;fare&quot;: 9000.0 },
+      { &quot;date&quot;: &quot;2026-08-02&quot;, &quot;fare&quot;: 9050.0 }
+    ]
+  }
+]
+</code></pre>
+<p><strong>Logic</strong>: For each <code>BasketItem</code>, <code>_build_item_detail()</code> computes:
+- <code>currentFare</code>: Median of valid quotes on the latest collection date
+- <code>priceRelative</code>: <code>current / base</code> (ratio, not percentage)
+- <code>change7d</code>: <code>((current - fare_7d_ago) / fare_7d_ago) × 100</code>
+- <code>history</code>: 30-day daily median fare series</p>
+<hr />
+<h3><code>GET /api/v1/route/{route_id}</code></h3>
+<p>Returns 5 basket items (one per AP window) for a single route.</p>
+<hr />
+<h3><code>GET /api/v1/index-history?freq=daily|weekly|monthly</code></h3>
+<p>Returns the APIx time series.</p>
+<pre><code class="language-json">[
+  { &quot;date&quot;: &quot;2026-05-29&quot;, &quot;apix&quot;: 100.0, &quot;frequency&quot;: &quot;daily&quot; },
+  { &quot;date&quot;: &quot;2026-05-30&quot;, &quot;apix&quot;: 100.12, &quot;frequency&quot;: &quot;daily&quot; }
+]
+</code></pre>
+<p><strong>Aggregation</strong>: Daily data is aggregated server-side by <code>aggregate_by_frequency()</code> — ISO-week Monday alignment for weekly, calendar month for monthly.</p>
+<hr />
+<h3><code>GET /api/v1/data-quality</code></h3>
+<p>Returns per-source 30-day aggregated quality stats.</p>
+<hr />
+<h3><code>POST /api/v1/trigger-scrape/{type}</code></h3>
+<p>Manually triggers a scraping run. <code>type</code> = <code>"web"</code> or <code>"api"</code>.</p>
+<hr />
+<h2>7. Scraping Infrastructure</h2>
+<h3>7.1 Ethical Scraping Framework</h3>
+<p>The project implements extensive anti-abuse measures:</p>
+<ol>
+<li><strong><code>robots.txt</code> compliance</strong>: <code>RobotsChecker</code> checks each site's robots.txt (24-hour cache) before scraping</li>
+<li><strong>Rate limiting</strong>: 5–12 second random delay between requests; 60-second pause between scrapers</li>
+<li><strong>Anti-bot rotation</strong>: Different scrapers run in different time slots to avoid detection</li>
+<li><strong>Stealth browser</strong>: Playwright with <code>navigator.webdriver</code> patches, fake plugins, random user agents/viewports, CAPTCHA detection</li>
+</ol>
+<h3>7.2 Scheduler Slots</h3>
+<pre><code>Slot A (06:30 IST): SerpAPI → EaseMyTrip → Akasa Air
+Slot B (12:30 IST): ClearTrip → SpiceJet → EaseMyTrip
+Slot C (19:30 IST): Air India Express → IndiGo → SpiceJet
+</code></pre>
+<p>Each slot iterates over all 8 routes × 5 AP windows = <strong>40 queries per scraper</strong>.</p>
+<h3>7.3 Data Cleaning (<a href="file:///c:/Users/HP/Desktop/final_sih-8/backend/app/pipeline/cleaner.py">cleaner.py</a>)</h3>
+<p>Per-route fare bounds validation:</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Min (₹)</th>
+<th>Max (₹)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEL-BOM</td>
+<td>1,500</td>
+<td>35,000</td>
+</tr>
+<tr>
+<td>DEL-BLR</td>
+<td>1,800</td>
+<td>40,000</td>
+</tr>
+<tr>
+<td>BLR-HYD</td>
+<td>800</td>
+<td>20,000</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>500</td>
+<td>50,000</td>
+</tr>
+</tbody>
+</table>
+<p>Additional checks: <code>base_fare &gt; 0</code>, <code>total_fare &gt;= base_fare</code>, <code>0 ≤ ap_days ≤ 365</code>.</p>
+<p>IQR outlier filtering: For groups with ≥ 4 observations, removes items outside $[Q1 - 3 \times IQR, Q3 + 3 \times IQR]$.</p>
+<hr />
+<h2>8. Frontend — Complete Technical Details</h2>
+<h3>8.1 Directory Structure</h3>
+<pre><code>frontend/src/
+├── main.jsx                     # React 19 entry + QueryClientProvider
+├── App.jsx                      # React Router route declarations
+├── index.css                    # Tailwind v4 @theme + global styles
+├── api.js                       # Dual-mode data layer (real API / mock)
+├── assets/                      # Static images (hero, logos)
+├── mocks/
+│   └── airfareData.json         # 40-item mock dataset for offline dev
+├── utils/
+│   └── aggregation.js           # Client-side weekly/monthly bucketing
+├── components/
+│   ├── charts/
+│   │   ├── IndexLineChart.jsx   # APIx trend chart (D/W/M + range filters)
+│   │   ├── PremiumHeatmap.jsx   # Route × AP-window price relative grid
+│   │   └── Sparkline.jsx        # Compact inline trend line
+│   ├── data-quality/
+│   │   └── ProvenancePanel.jsx  # Source collection table + CSV export
+│   ├── explorer/
+│   │   └── FilterPanel.jsx      # Multi-facet filter sidebar
+│   ├── layout/
+│   │   ├── AppShell.jsx         # Shell (header, nav, breadcrumbs, footer)
+│   │   ├── GovUtilityBar.jsx    # Accessibility bar (font size, contrast)
+│   │   ├── SearchOverlay.jsx    # Route/page fuzzy search modal
+│   │   └── SummaryStrip.jsx     # 4 KPI tiles (APIx, Routes, MoM, YoY)
+│   ├── shared/
+│   │   ├── Card.jsx             # Base card component
+│   │   ├── ExportButton.jsx     # Client-side CSV generator
+│   │   ├── InfoTooltip.jsx      # Hover tooltip bubble
+│   │   ├── NumberCell.jsx       # FareCell, ChangeCell, RelativeCell
+│   │   └── Skeleton.jsx         # Loading skeleton
+│   └── table/
+│       ├── DataTable.jsx        # TanStack Table v8 wrapper
+│       ├── DensityToggle.jsx    # Compact/Comfortable row toggle
+│       └── RouteTableColumns.jsx # Column definitions
+└── pages/
+    ├── Overview.jsx             # Home: India SVG map + chart + movers
+    ├── DataExplorer.jsx         # Multi-view explorer (line/bar/table/heatmap)
+    ├── Routes.jsx               # Full basket data table
+    ├── RouteDetail.jsx          # Single route: chart + AP table + metadata
+    ├── Methodology.jsx          # KaTeX formula documentation
+    ├── DataQuality.jsx          # QA metrics + trigger scrape buttons
+    └── ApiDocs.jsx              # REST API reference for consumers
+</code></pre>
+<h3>8.2 Data Flow in the Frontend</h3>
+<div class="mermaid">sequenceDiagram
+    participant U as User
+    participant R as React Component
+    participant TQ as TanStack Query
+    participant API as api.js
+    participant BE as Backend API
+
+    U->>R: Navigates to /
+    R->>TQ: useQuery(["summary"])
+    TQ->>API: getSummary()
+    alt VITE_API_URL is set
+        API->>BE: GET /api/v1/summary
+        BE-->>API: JSON response
+    else Mock mode
+        API-->>API: Return mockData.summary
+    end
+    API-->>TQ: Data
+    TQ-->>R: { data, isLoading, isError }
+    R->>U: Render dashboard
+</div>
+
+<h3>8.3 Design System</h3>
+<p><strong>Theme tokens</strong> defined in <code>index.css</code> via Tailwind v4 <code>@theme</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Value</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--color-primary</code></td>
+<td><code>#0F5C5C</code></td>
+<td>Headers, buttons, chart lines</td>
+</tr>
+<tr>
+<td><code>--color-primary-dark</code></td>
+<td><code>#0A4444</code></td>
+<td>Hover states</td>
+</tr>
+<tr>
+<td><code>--color-accent</code></td>
+<td><code>#BC8D14</code></td>
+<td>Gold highlights (WCAG AA ≥ 3:1)</td>
+</tr>
+<tr>
+<td><code>--color-success</code></td>
+<td><code>#1A8754</code></td>
+<td>Price decreases (green)</td>
+</tr>
+<tr>
+<td><code>--color-danger</code></td>
+<td><code>#C23B2C</code></td>
+<td>Price increases (red)</td>
+</tr>
+<tr>
+<td><code>--color-bg-alt</code></td>
+<td><code>#F4F6F6</code></td>
+<td>Alternating row backgrounds</td>
+</tr>
+<tr>
+<td><code>--color-text-secondary</code></td>
+<td><code>#5C6B6B</code></td>
+<td>Muted labels</td>
+</tr>
+<tr>
+<td><code>--color-border</code></td>
+<td><code>#DCE4E4</code></td>
+<td>Table/card borders</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Typography</strong>: Public Sans (body) + IBM Plex Mono (numbers/code). All numeric data uses <code>font-mono tabular-nums</code> for column alignment.</p>
+<p><strong>Accessibility</strong>: WCAG 2.1 AA compliant. ▲/▼ arrows supplement red/green color coding for colorblind users. High-contrast mode toggle via <code>GovUtilityBar</code>. Skip-to-content link. <code>aria-pressed</code>, <code>aria-label</code> on all interactive elements.</p>
+<h3>8.4 Page-by-Page Breakdown</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Key Components</th>
+<th>Data Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overview</strong></td>
+<td><code>/</code></td>
+<td>SVG India map, IndexLineChart, SummaryStrip, Top Movers, Active Components table</td>
+<td><code>getSummary()</code> + <code>getBasketItems()</code></td>
+</tr>
+<tr>
+<td><strong>Data Explorer</strong></td>
+<td><code>/explorer</code></td>
+<td>FilterPanel sidebar, Line/Bar/Table/Heatmap views, ExportButton</td>
+<td><code>getBasketItems()</code></td>
+</tr>
+<tr>
+<td><strong>Routes</strong></td>
+<td><code>/routes</code></td>
+<td>DataTable (TanStack v8), DensityToggle, global filter, IndexLineChart</td>
+<td><code>getBasketItems()</code></td>
+</tr>
+<tr>
+<td><strong>Route Detail</strong></td>
+<td><code>/route/:id</code></td>
+<td>KPI strip, Fare History chart, AP Windows table, Route Characteristics</td>
+<td><code>getRouteDetail(id)</code></td>
+</tr>
+<tr>
+<td><strong>Methodology</strong></td>
+<td><code>/methodology</code></td>
+<td>KaTeX formulas, AP window table, Laspeyres/Törnqvist documentation</td>
+<td>Static content</td>
+</tr>
+<tr>
+<td><strong>Data Quality</strong></td>
+<td><code>/data-quality</code></td>
+<td>ProvenancePanel, QA framework metrics, Trigger Scrape buttons</td>
+<td><code>getDataQuality()</code></td>
+</tr>
+<tr>
+<td><strong>API Docs</strong></td>
+<td><code>/api-docs</code></td>
+<td>REST endpoint reference with code examples</td>
+<td>Static content</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>9. Data Flow: End to End</h2>
+<div class="mermaid">flowchart TD
+    A["APScheduler triggers Slot A/B/C"] --> B["Scraper iterates 8 routes × 5 AP windows"]
+    B --> C["For each query: check robots.txt → fetch page → extract fare"]
+    C --> D["Cleaner validates: bounds check + IQR filter"]
+    D -->|Valid| E["INSERT into raw_quotes (is_valid=True)"]
+    D -->|Invalid| F["INSERT into raw_quotes (is_valid=False, rejection_reason)"]
+    E --> G["compute_representative_fare() — median per cell"]
+    G --> H["compute_price_relative() — current/base × 100"]
+    H --> I["compute_apix_for_date() — weighted Laspeyres sum"]
+    I --> J["INSERT into index_values"]
+    J --> K["compute_mom_change() + compute_yoy_change()"]
+    K --> L["Data ready for API consumption"]
+    L --> M["Frontend fetches via TanStack Query"]
+    M --> N["React renders dashboards, charts, tables"]
+</div>
+
+<h3>Key Formulas Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Representative Fare</strong></td>
+<td>$\tilde{p}_{r,w,t} = \text{median}(\text{valid quotes for route } r, \text{AP window } w, \text{date } t)$</td>
+</tr>
+<tr>
+<td><strong>Price Relative</strong></td>
+<td>$PR_i = \frac{p_{i,t}}{p_{i,0}} \times 100$ (base period fare = $p_{i,0}$)</td>
+</tr>
+<tr>
+<td><strong>APIx (Laspeyres)</strong></td>
+<td>$APIx_t = \frac{\sum_i W_i \times PR_i}{\sum_i W_i}$</td>
+</tr>
+<tr>
+<td><strong>MoM Change</strong></td>
+<td>$\Delta_{MoM} = \frac{\bar{APIx}<em>{\text{this month}} - \bar{APIx}</em>{\text{last month}}}{\bar{APIx}_{\text{last month}}} \times 100$</td>
+</tr>
+<tr>
+<td><strong>YoY Change</strong></td>
+<td>$\Delta_{YoY} = \frac{\bar{APIx}<em>{\text{this 7d}} - \bar{APIx}</em>{\text{same 7d last year}}}{\bar{APIx}_{\text{same 7d last year}}} \times 100$</td>
+</tr>
+<tr>
+<td><strong>APIx (Törnqvist)</strong></td>
+<td>$\ln(APIx_t/APIx_{t-1}) = \sum_{r,w} \bar{s}<em>{r,w} \cdot \ln(p</em>{r,w,t}/p_{r,w,t-1})$</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>10. File Tree</h2>
+<pre><code>final_sih-8/
+├── backend/
+│   ├── .env
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── seed_data.py
+│   ├── airfare_index.db
+│   ├── app/
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── main.py
+│   │   ├── models.py           (11 tables, 313 lines)
+│   │   ├── schemas.py          (145 lines)
+│   │   ├── api/
+│   │   │   ├── basket.py       (177 lines)
+│   │   │   ├── summary.py      (94 lines)
+│   │   │   ├── history.py      (38 lines)
+│   │   │   └── data_quality.py (142 lines)
+│   │   ├── pipeline/
+│   │   │   ├── apix_pipeline.py (8-stage research pipeline)
+│   │   │   ├── index.py         (operational Laspeyres)
+│   │   │   └── cleaner.py       (validation + IQR)
+│   │   └── scraper/
+│   │       ├── scheduler.py     (3-slot APScheduler)
+│   │       ├── mock_scraper.py  (offline synthetic data)
+│   │       └── ... (10 scraper modules)
+│   └── tests/
+│       ├── fixtures.py
+│       └── test_api.py
+└── frontend/
+    ├── index.html
+    ├── package.json
+    ├── vite.config.js
+    ├── .env.local              (VITE_API_URL=http://localhost:8000/api/v1)
+    └── src/
+        ├── main.jsx
+        ├── App.jsx
+        ├── index.css           (Tailwind v4 @theme + global styles)
+        ├── api.js              (dual-mode: real API / mock)
+        ├── utils/aggregation.js
+        ├── mocks/airfareData.json
+        ├── components/         (15 components across 6 folders)
+        └── pages/              (7 pages)
+</code></pre>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+</body>
+</html>

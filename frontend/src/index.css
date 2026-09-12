@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --color-primary: #0F5C5C;
+  --color-primary-dark: #0A4444;
+  --color-accent: #BC8D14;
+  --color-accent-hover: #967110;
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #F4F6F6;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #5C6B6B;
+  --color-border: #DCE4E4;
+  --color-success: #1A8754;
+  --color-danger: #C23B2C;
+  --color-chart-1: #0F5C5C;
+  --color-chart-2: #BC8D14;
+  --color-chart-3: #4A7C7C;
+  --color-chart-4: #8C6A1F;
+  --color-chart-5: #2E8B8B;
+  --color-chart-6: #A63D2C;
+  --color-chart-7: #6B8E8E;
+  --color-chart-8: #C9A227;
+}
+
+@layer base {
+  html.high-contrast {
+    filter: contrast(1.5) grayscale(1);
+    background-color: var(--color-text-primary);
+  }
+}
+
+@layer components {
+  .app-card {
+    @apply rounded-2xl border border-primary/20 bg-bg-alt shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5;
+  }
+}
+
+@layer utilities {
+  .animate-skeleton {
+    animation: skeleton 1.5s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes skeleton {
+  0% { opacity: 0.5; background-color: var(--color-bg-alt); }
+  100% { opacity: 1; background-color: var(--color-bg-alt); }
+}
+
+/* Custom styling for native date picker */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+html { background: var(--color-bg-alt); }
+body { margin: 0; background: var(--color-bg-alt); color: var(--color-text-primary); }
+* { box-sizing: border-box; }
+.font-mono { font-feature-settings: "tnum"; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+::selection { background: rgba(233,79,100,.18); color: var(--color-text-primary); }
+
+input, select, textarea { border-color: var(--color-border) !important; background: #fff; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--color-accent) !important; box-shadow: 0 0 0 3px rgba(233,79,100,.10); }
+
+a:hover { text-decoration-thickness: 1.5px; }
+
+/* Global visual language used by every tab. */
+section { scroll-margin-top: 75px; }
+section.bg-bg-alt, .bg-bg-alt.border, .bg-bg-alt.border-border, .bg-bg-alt.border-border {
+  box-shadow: 0 6px 20px rgba(41,32,85,.055);
+}
+
+thead tr { background: var(--color-bg-alt); }
+tbody tr:hover { background: var(--color-bg-alt) !important; }
+
+/* Recharts */
+.recharts-cartesian-grid-horizontal line { stroke: var(--color-border) !important; }
+.recharts-tooltip-wrapper { filter: drop-shadow(0 10px 20px rgba(31,26,73,.12)); }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: #eeeaf4; }
+::-webkit-scrollbar-thumb { background: #c8c2d7; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa2bc; }
+
+/* Consistent page headers on the secondary tabs. */
+[data-page="api"] > header,
+[data-page="quality"] > header,
+[data-page="routes"] > div:first-child,
+[data-page="route-detail"] > div:first-child,
+[data-page="methodology"] header {
+  border-color: var(--color-border) !important;
+  box-shadow: 0 8px 26px rgba(41,32,85,.06) !important;
+}
+
+/* Secondary pages inherit the same indigo / coral / aqua vocabulary. */
+[data-page="api"] code { color: var(--color-accent); }
+[data-page="quality"] .text-emerald-600,
+[data-page="quality"] .text-emerald-700 { color: var(--color-success) !important; }
+
+@media (max-width: 767px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  table {
+    min-width: max-content;
+  }
+
+  section {
+    scroll-margin-top: 70px;
+  }
+}
+
+@media (max-width: 900px) {
+  header nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  header nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Keyboard focus (WCAG 2.1 AA) ──────────────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ── High contrast mode (toggled by GovUtilityBar) ─────────────────────────── */
+html.high-contrast {
+  filter: contrast(1.5) saturate(0);
+}
+html.high-contrast body {
+  background: var(--color-text-primary) !important;
+  color: #fff !important;
+}
+html.high-contrast header,
+html.high-contrast footer {
+  background: var(--color-text-primary) !important;
+  border-color: #fff !important;
+}
+html.high-contrast a,
+html.high-contrast button {
+  color: #ff0 !important;
+}
+html.high-contrast .bg-bg-alt {
+  background: #111 !important;
+  color: #fff !important;
+}
